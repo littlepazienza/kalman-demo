@@ -7,7 +7,6 @@ const EMPTY_COLOR = "#FFFFFF";
 const WALL_COLOR = "#000000";
 const KALMAN_COLOR = "#850c5d";
 
-
 // Construct the universe, and get its width and height.
 const graph = Graph.new(3, 3);
 const width = graph.width();

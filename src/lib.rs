@@ -10,10 +10,16 @@ pub enum Cell {
     Wall = 2
 }
 
+pub struct Kalman {
+    row: u32,
+    column: u32
+}
+
 #[wasm_bindgen]
 pub struct Graph {
     width: u32,
     height: u32,
+    kalman: Kalman,
     cells: Vec<Cell>,
 }
 
@@ -38,16 +44,21 @@ impl Graph {
 
         // Do something to the cells based on the decision of the agent.
 
+
         self.cells = next;
     }
 
     pub fn new(seed_w: u32, seed_h: u32) -> Graph {
         let width = 64;
         let height = 64;
+        let kalman = Kalman {
+            row: seed_w,
+            column: seed_h
+        };
 
         let cells = (0..width * height)
             .map(|i| {
-                if i == (seed_w * width + seed_h) {
+                if i == seed_w * width + seed_h {
                     Cell::Kalman
                 } else {
                     Cell::Empty
@@ -58,6 +69,7 @@ impl Graph {
         Graph {
             width,
             height,
+            kalman,
             cells,
         }
     }
@@ -78,6 +90,7 @@ impl Graph {
         self.cells.as_ptr()
     }
 }
+
 impl fmt::Display for Graph {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for line in self.cells.as_slice().chunks(self.width as usize) {
