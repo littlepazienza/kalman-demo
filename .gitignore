@@ -1,0 +1,9 @@
+/target
+.idea
+pkg
+package-lock.json
+node_modules
+
+
+# Once the project is done comment this out
+Cargo.lock
