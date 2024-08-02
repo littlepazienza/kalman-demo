@@ -3,8 +3,10 @@ import { memory } from "kalman-demo/kalman_demo_bg";
 
 const CELL_SIZE = 5; // px
 const GRID_COLOR = "#CCCCCC";
-const DEAD_COLOR = "#FFFFFF";
-const ALIVE_COLOR = "#000000";
+const EMPTY_COLOR = "#FFFFFF";
+const WALL_COLOR = "#000000";
+const KALMAN_COLOR = "#333f00";
+
 
 // Construct the universe, and get its width and height.
 const graph = Graph.new(3, 3);
@@ -52,7 +54,7 @@ const getIndex = (row, column) => {
 };
 
 const drawCells = () => {
-    const cellsPtr = universe.cells();
+    const cellsPtr = graph.cells();
     const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
 
     ctx.beginPath();
@@ -61,9 +63,13 @@ const drawCells = () => {
         for (let col = 0; col < width; col++) {
             const idx = getIndex(row, col);
 
-            ctx.fillStyle = cells[idx] === Cell.Dead
-                ? DEAD_COLOR
-                : ALIVE_COLOR;
+            if (cells[idx] === Cell.Empty) {
+                ctx.fillStyle = EMPTY_COLOR;
+            } else if (cells[idx] === Cell.Wall) {
+                ctx.fillStyle = WALL_COLOR;
+            } else if (cells[idx] === Cell.Kalman) {
+                ctx.fillStyle = KALMAN_COLOR;
+            }
 
             ctx.fillRect(
                 col * (CELL_SIZE + 1) + 1,
