@@ -1,11 +1,11 @@
 import { Graph, Cell } from "kalman-demo";
 import { memory } from "kalman-demo/kalman_demo_bg";
 
-const CELL_SIZE = 5; // px
+const CELL_SIZE = 10; // px
 const GRID_COLOR = "#CCCCCC";
 const EMPTY_COLOR = "#FFFFFF";
 const WALL_COLOR = "#000000";
-const KALMAN_COLOR = "#333f00";
+const KALMAN_COLOR = "#850c5d";
 
 
 // Construct the universe, and get its width and height.
@@ -21,14 +21,49 @@ canvas.width = (CELL_SIZE + 1) * width + 1;
 
 const ctx = canvas.getContext('2d');
 
-const renderLoop = () => {
+function start_animate(duration) {
+    var requestID;
+    var startTime =null;
+    var time ;
+
+    var animate = function(time) {
+
+
+        time = new Date().getTime(); //millisecond-timstamp
+
+        if (startTime === null) {
+            startTime = time;
+        }
+        var progress = time - startTime;
+
+        if (progress < duration ) {
+
+
+        }
+        else{
+            cancelAnimationFrame(requestID);
+        }
+        requestID=requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+const renderLoop = async () => {
     graph.tick();
 
     drawGrid();
     drawCells();
 
+    await delay(1000);
+
     requestAnimationFrame(renderLoop);
 };
+
+function delay(milliseconds){
+    return new Promise(resolve => {
+        setTimeout(resolve, milliseconds);
+    });
+}
 
 const drawGrid = () => {
     ctx.beginPath();
