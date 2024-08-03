@@ -53,7 +53,7 @@ const renderLoop = async () => {
     drawGrid();
     drawCells();
 
-    await delay(1000);
+    await delay(500);
 
     requestAnimationFrame(renderLoop);
 };
