@@ -22,29 +22,24 @@ pub struct Graph {
     cells: Vec<Cell>,
 }
 
-impl Graph {
-
-    /*
-     * Convert the 2D ref to a cell to its real vector index.
-     */
-    fn get_index(&self, row: u32, column: u32) -> usize {
-        (row * self.width + column) as usize
-    }
-    // ...
-}
-
 #[wasm_bindgen]
 impl Graph {
+    /*
+     * Static function for returning the 1D index from the 2D index.
+     */
+    pub fn get_index(width: u32, row: u32, column: u32) -> usize {
+        (row * width + column) as usize
+    }
     /*
      * Execute a single timestep.
      */
     pub fn tick(&mut self) {
         let mut next = self.cells.clone();
-        let mut old_index = self.get_index(self.kalman.row, self.kalman.column).clone();
+        let mut old_index = Graph::get_index(self.width, self.kalman.row, self.kalman.column).clone();
 
         // Do something to the cells based on the decision of the agent.
         self.kalman.update_index(self.clone());
-        let new_index = self.get_index(self.kalman.row, self.kalman.column).clone();
+        let new_index = Graph::get_index(self.width, self.kalman.row, self.kalman.column).clone();
 
         // Update the old cell to empty and the new cell to Kalman
         next[old_index] = Cell::Empty;
@@ -59,7 +54,7 @@ impl Graph {
 
         let cells = (0..width * height)
             .map(|i| {
-                if i == seed_w * width + seed_h {
+                if i as usize == Graph::get_index(width, seed_w, seed_h).clone() {
                     Cell::Kalman
                 } else {
                     Cell::Empty

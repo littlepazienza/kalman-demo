@@ -83,10 +83,6 @@ const drawGrid = () => {
     ctx.stroke();
 };
 
-const getIndex = (row, column) => {
-    return row * width + column;
-};
-
 const drawCells = () => {
     const cellsPtr = graph.cells();
     const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
@@ -95,7 +91,7 @@ const drawCells = () => {
 
     for (let row = 0; row < height; row++) {
         for (let col = 0; col < width; col++) {
-            const idx = getIndex(row, col);
+            const idx = Graph.get_index(width, row, col);
 
             if (cells[idx] === Cell.Empty) {
                 ctx.fillStyle = EMPTY_COLOR;
