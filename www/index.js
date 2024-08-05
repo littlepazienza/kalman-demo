@@ -1,4 +1,4 @@
-import { Graph, Cell } from "kalman-demo";
+import { Graph } from "kalman-demo";
 import { memory } from "kalman-demo/kalman_demo_bg";
 
 const CELL_SIZE = 10; // px
