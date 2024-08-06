@@ -33,6 +33,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish wasm-pack generated node package to npm
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
