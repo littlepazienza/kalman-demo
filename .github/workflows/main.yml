@@ -17,34 +17,34 @@ jobs:
           - stable
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Build rust with wasm-pack
-        run: |
+      - run: |
           rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
           curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
           wasm-pack build
 
       - name: Setup node
       - uses: actions/setup-node@v4
-        with:
+      - with:
           node-version: '22.x'
 
       - name: Publish wasm-pack generated node package to npm
-        env:
+      - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
+      - run: |
           cd ./pkg
           npm ci
           npm publish --provenance --access public
 
       - name: Build website with npm
-        run: | 
+      - run: | 
           npm install www
           tar -czf website.tar.gz ./www/*
 
       - name: Archive Website
-        uses: actions/upload-artifact@v4
-        with:
+      - uses: actions/upload-artifact@v4
+      - with:
           name: website
           path: ./website.tar.gz
