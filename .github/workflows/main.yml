@@ -16,8 +16,7 @@ jobs:
         toolchain:
           - stable
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Build rust with wasm-pack
         env:
@@ -41,7 +40,7 @@ jobs:
           npm publish --access public
 
   archive-website:
-    name: Build website
+    name: Build and archive website
     runs-on: ubuntu-latest
     needs: wasm-to-npm
     if: always()
@@ -52,6 +51,8 @@ jobs:
       id-token: write
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Build website with npm
         run: |
           npm install www
