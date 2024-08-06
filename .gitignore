@@ -3,7 +3,7 @@
 pkg
 package-lock.json
 node_modules
-
+www/dist
 
 # Once the project is done comment this out
 Cargo.lock

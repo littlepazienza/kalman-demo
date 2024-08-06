@@ -56,11 +56,13 @@ jobs:
 
       - name: Build website with npm
         run: |
-          npm install www
-          tar -czf website.tar.gz ./www/*
+          cd www
+          npm install
+          npx webpack
+          tar -czf website.tar.gz ./dist/*
 
       - name: Archive Website
         uses: actions/upload-artifact@v4
         with:
           name: website
-          path: ./website.tar.gz
+          path: ./www/website.tar.gz
