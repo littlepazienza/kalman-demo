@@ -2,10 +2,13 @@ use std::vec::Vec;
 use wasm_bindgen::prelude::wasm_bindgen;
 use crate::Universe;
 
+static VELOCITY: f32 = 0.3f32;
+
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct Kalman {
     pos: Vec<f32>,
+    goal: Vec<f32>
 }
 
 #[wasm_bindgen]
@@ -32,7 +35,8 @@ impl Kalman {
 
     pub fn new(seed_w: f32, seed_h: f32) -> Kalman {
         Kalman {
-            pos: Vec::from([seed_w, seed_h, 0.0, 0.0])
+            pos: Vec::from([seed_w, seed_h, VELOCITY, 0.0]),
+            goal: Vec::from([seed_w, seed_h])
         }
     }
 
@@ -55,9 +59,10 @@ impl Kalman {
     }
 
     /*
-     * Read from the rotation sensor, 80% (TBD) of the time, the rotation is succesful and the bot
+     * Read from the rotation sensor which has a reading accuracy of 98%.
+     * Kalman rotates with 98% accuracy, meaning he rotates exactly as commanded 98% of the time
      */
-    pub fn read_sensor() {
+    pub fn read_rotation_sensor() {
 
     }
 }

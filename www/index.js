@@ -7,10 +7,9 @@ const WALL_COLOR = "#000000";
 const KALMAN_COLOR = "#850c5d";
 
 // Construct the universe, and get its width and height.
-const universe = Universe.new(300.0, 300.0);
+const universe = Universe.new(30.0, 30.0);
 const width = universe.width() / 100;
 const height = universe.height() / 100;
-universe.set_kalman_rotation(-2.3);
 
 // Give the canvas room for all of our cells and a 1px border
 // around each of them.
@@ -77,15 +76,22 @@ drawGrid();
 drawUniverse();
 renderLoop();
 
-const registerSetVelocity = () => {
+const registerInputs = () => {
     document.getElementById('set_velocity').addEventListener('click', function(e)
     {
         setVelocity();
     }, false);
+    document.getElementById('set_rotation').addEventListener('click', function(e)
+    {
+        setRotation();
+    }, false);
 }
-registerSetVelocity();
+registerInputs();
 
 const setVelocity = () => {
     universe.set_kalman_velocity(document.getElementById("velocity").value)
+}
+const setRotation = () => {
+    universe.set_kalman_rotation(document.getElementById("rotation").value)
 }
 
