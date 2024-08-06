@@ -3,6 +3,7 @@ name = "kalman-demo"
 version = "0.1.0"
 authors = ["Benjamin Pazienza <pazienza.log@gmail.com>"]
 edition = "2021"
+repository = "https://github.com/littlepaz/kalman-demo"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
