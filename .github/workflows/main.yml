@@ -34,6 +34,8 @@ jobs:
         run: | 
           cd ./www
           npm install
+          rm node_modules/kalman-demo
+          mv ../pkg node_modules/kalman-demo
           tar -czf website.tar.gz *
 
       - name: Archive Website
