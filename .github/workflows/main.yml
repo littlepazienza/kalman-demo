@@ -38,7 +38,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd ./pkg
-          npm publish --provenance --access public
+          npm publish
 
       - name: Build website with npm
         run: |
