@@ -32,14 +32,11 @@ jobs:
 
       - name: Build website with npm
         run: | 
-          cd ./www
-          npm install
-          rm node_modules/kalman-demo
-          mv ../pkg node_modules/kalman-demo
+          npm install www
           tar -czf website.tar.gz *
 
       - name: Archive Website
         uses: actions/upload-artifact@v4
         with:
           name: website
-          path: ./www/website.tar.gz
+          path: ./website.tar.gz
