@@ -8,25 +8,18 @@ use kalman::Kalman;
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct Universe {
-    width: u64,
-    height: u64,
+    width: u32,
+    height: u32,
     kalman: Kalman,
 }
 
 #[wasm_bindgen]
 impl Universe {
     /*
-     * Static function for returning the 1D index from the 2D index.
-     */
-    pub fn get_index(width: u64, row: u64, column: u64) -> usize {
-        (row * width + column) as usize
-    }
-
-    /*
      * Execute a single timestep.
      */
     pub fn tick(&mut self) {
-        self.kalman.update_index();
+        self.kalman.tick(self.clone());
     }
 
     pub fn new(seed_w: f32, seed_h: f32) -> Universe {
@@ -41,11 +34,29 @@ impl Universe {
         }
     }
 
-    pub fn width(&self) -> u64 {
+    pub fn width(&self) -> u32 {
         self.width
     }
 
-    pub fn height(&self) -> u64 {
+    pub fn height(&self) -> u32 {
         self.height
+    }
+
+    pub fn kalman(&self) -> Kalman {
+        self.kalman.clone()
+    }
+
+    /*
+     * Used for test.
+     */
+    pub fn set_kalman_velocity(&mut self, velocity: f32) {
+        self.kalman.set_velocity(velocity)
+    }
+
+    /*
+     * Used for test.
+     */
+    pub fn set_kalman_rotation(&mut self, rotation: f32) {
+        self.kalman.set_rotation(rotation)
     }
 }
