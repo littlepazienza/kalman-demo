@@ -1,82 +1,37 @@
+extern crate core;
+
 mod kalman;
 
 use wasm_bindgen::prelude::*;
-use std::fmt;
 use kalman::Kalman;
 
 #[wasm_bindgen]
-#[repr(u8)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Cell {
-    Empty = 0,
-    Kalman = 1,
-    Wall = 2
-}
-
-#[wasm_bindgen]
 #[derive(Clone)]
-pub struct Graph {
+pub struct Universe {
     width: u32,
     height: u32,
     kalman: Kalman,
-    cells: Vec<Cell>,
-}
-
-impl Graph {
-
-    /*
-     * Convert the 2D ref to a cell to its real vector index.
-     */
-    fn get_index(&self, row: u32, column: u32) -> usize {
-        (row * self.width + column) as usize
-    }
-    // ...
 }
 
 #[wasm_bindgen]
-impl Graph {
+impl Universe {
     /*
      * Execute a single timestep.
      */
     pub fn tick(&mut self) {
-        let mut next = self.cells.clone();
-        let mut old_index = self.get_index(self.kalman.row, self.kalman.column).clone();
-
-        // Do something to the cells based on the decision of the agent.
-        self.kalman.update_index(self.clone());
-        let new_index = self.get_index(self.kalman.row, self.kalman.column).clone();
-
-        // Update the old cell to empty and the new cell to Kalman
-        next[old_index] = Cell::Empty;
-        next[new_index] = Cell::Kalman;
-        self.cells = next;
+        self.kalman.tick(self.clone());
     }
 
-    pub fn new(seed_w: u32, seed_h: u32) -> Graph {
-        let width = 64;
-        let height = 64;
+    pub fn new(seed_w: f32, seed_h: f32) -> Universe {
+        let width = 6400;
+        let height = 6400;
         let kalman = Kalman::new(seed_w, seed_h);
 
-        let cells = (0..width * height)
-            .map(|i| {
-                if i == seed_w * width + seed_h {
-                    Cell::Kalman
-                } else {
-                    Cell::Empty
-                }
-            })
-            .collect();
-
-        Graph {
+        Universe {
             width,
             height,
             kalman,
-            cells,
         }
-    }
-
-    pub fn render(&self) -> String {
-        self.to_string()
     }
 
     pub fn width(&self) -> u32 {
@@ -87,35 +42,21 @@ impl Graph {
         self.height
     }
 
-    pub fn cells(&self) -> *const Cell {
-        self.cells.as_ptr()
+    pub fn kalman(&self) -> Kalman {
+        self.kalman.clone()
     }
-}
 
-impl fmt::Display for Graph {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for line in self.cells.as_slice().chunks(self.width as usize) {
-            for &cell in line {
-                let symbol = match cell {
-                    Cell::Empty => '◻',
-                    Cell::Kalman => 'Κ',
-                    Cell::Wall => '◼'
-                };
-                write!(f, "{}", symbol)?;
-            }
-            write!(f, "\n")?;
-        }
-
-        Ok(())
+    /*
+     * Used for test.
+     */
+    pub fn set_kalman_velocity(&mut self, velocity: f32) {
+        self.kalman.set_velocity(velocity)
     }
-}
 
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, Kalman Demo!");
+    /*
+     * Used for test.
+     */
+    pub fn set_kalman_rotation(&mut self, rotation: f32) {
+        self.kalman.set_rotation(rotation)
+    }
 }

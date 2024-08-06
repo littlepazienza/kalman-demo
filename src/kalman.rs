@@ -1,43 +1,68 @@
-use crate::Graph;
+use std::vec::Vec;
+use wasm_bindgen::prelude::wasm_bindgen;
+use crate::Universe;
 
+static VELOCITY: f32 = 0.3f32;
+
+#[wasm_bindgen]
 #[derive(Clone)]
 pub struct Kalman {
-    pub(crate) row: u32,
-    pub(crate) column: u32,
-    prev_row: u32,
-    prev_col: u32
+    pos: Vec<f32>,
+    goal: Vec<f32>
+}
+
+#[wasm_bindgen]
+impl Kalman {
+    pub fn get_x(&self) -> f32 {
+        return self.pos[0];
+    }
+
+    pub fn get_y(&self) -> f32 {
+        return self.pos[1];
+    }
+
+    pub fn get_velocity(&self) -> f32 {
+        return self.pos[2];
+    }
+
+    pub fn get_rotation(&self) -> f32 {
+        return self.pos[3];
+    }
 }
 
 
 impl Kalman {
 
-    pub fn new(seed_w: u32, seed_h: u32) -> Kalman {
+    pub fn new(seed_w: f32, seed_h: f32) -> Kalman {
         Kalman {
-            row: seed_w,
-            column: seed_h,
-            prev_row: seed_w,
-            prev_col: seed_h
+            pos: Vec::from([seed_w, seed_h, VELOCITY, 0.0]),
+            goal: Vec::from([seed_w, seed_h])
         }
     }
 
-    pub fn update_index(&mut self, g: Graph) {
-        // Do something to the cells based on the decision of the agent.
-        if self.prev_col < self.column {
-            self.prev_col = self.column;
-            self.prev_row = self.row;
-            if (self.column < g.width) {
-                self.column += 1;
-            } else {
-                self.prev_col = self.column;
-                self.column -=1;
-            }
-        } else {
-            self.prev_col = self.column;
-            if (self.column > 0) {
-                self.column -= 1;
-            } else {
-                self.column += 1;
-            }
+    pub fn set_velocity(&mut self, velocity: f32) {
+        self.pos[2] = velocity;
+    }
+
+    pub fn set_rotation(&mut self, rotation: f32) {
+        self.pos[3] = rotation;
+    }
+
+    /*
+     * Update 1 ms of movement.
+     */
+    pub fn tick(&mut self, universe: Universe) {
+        if self.pos[2] > 0f32 {
+            self.pos[0] = (self.pos[0] + self.pos[3].cos() * self.pos[2]).max(0f32).min(universe.width as f32);
+            self.pos[1] = (self.pos[1] + self.pos[3].sin() * self.pos[2]).max(0f32).min(universe.height as f32);
         }
+    }
+
+    /*
+     * Read from the rotation sensor which has a reading accuracy of 98%.
+     * Kalman rotates with 98% accuracy, meaning he rotates exactly as commanded 98% of the time
+     */
+    pub fn read_rotation_sensor() {
+
     }
 }

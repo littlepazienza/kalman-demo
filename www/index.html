@@ -4,6 +4,16 @@
     <meta charset="utf-8">
     <title>Kalman Filter Demo</title>
     <style>
+      .column {
+        float: left;
+        width: 20%;
+      }
+      /* Clear floats after the columns */
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
       body {
         position: absolute;
         top: 0;
@@ -19,7 +29,15 @@
   </head>
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-    <canvas id="canvas"></canvas>
+    <div class="row">
+      <div class="column">
+        <input type="number" placeholder="0mps" id="velocity"><button id="set_velocity">Set Velocity</button>
+        <input type="number" placeholder="0rad" id="rotation"><button id="set_rotation">Set Rotation</button>
+      </div>
+      <div class="column">
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
     <script src="./bootstrap.js"></script>
   </body>
 </html>
