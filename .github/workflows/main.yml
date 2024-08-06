@@ -35,11 +35,6 @@ jobs:
         env:
             NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Setup npm
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-
       - name: Build website with npm
         run: | 
           npm install www
