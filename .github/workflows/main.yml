@@ -35,6 +35,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd ./pkg
+          npm adduser ${{ secrets.NPM_USER }}
           npm publish --provenance --access public
 
       - name: Build website with npm
