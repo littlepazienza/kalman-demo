@@ -29,13 +29,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Publish wasm-pack generated node package to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_USER: ${{ secrets.NPM_USER }}
         run: |
           cd ./pkg
-          npm adduser ${{ secrets.NPM_USER }}
           npm publish --provenance --access public
 
       - name: Build website with npm
