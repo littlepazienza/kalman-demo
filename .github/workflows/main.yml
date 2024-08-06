@@ -3,7 +3,7 @@ name: Build Website
 on: [push]
 
 jobs:
-  wasm-to-tpm:
+  wasm-to-npm:
     name: Publish wasm-pack generated package to npm
     runs-on: ubuntu-latest
     permissions:
