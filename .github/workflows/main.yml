@@ -25,6 +25,16 @@ jobs:
           curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
           wasm-pack build
 
+      - name: Publish wasm to npm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm publish --provenance --access public
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Setup npm
         uses: actions/setup-node@v4
         with:
@@ -33,7 +43,7 @@ jobs:
       - name: Build website with npm
         run: | 
           npm install www
-          tar -czf website.tar.gz *
+          tar -czf website.tar.gz ./www/*
 
       - name: Archive Website
         uses: actions/upload-artifact@v4

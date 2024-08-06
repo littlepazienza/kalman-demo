@@ -1,4 +1,4 @@
-import { Universe, Kalman } from "kalman-demo";
+import { Universe, Kalman } from "littlepaz-kalman-demo";
 
 const CELL_SIZE = 10; // px
 const GRID_COLOR = "#CCCCCC";
