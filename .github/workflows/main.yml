@@ -16,24 +16,28 @@ jobs:
         toolchain:
           - stable
     steps:
-      - name: Check out the repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: actions/checkout@v4
+      - name: Build rust with wasm-pack
+        run: |
+          rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+          wasm-pack build
 
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: wasm-pack build
-
-      - name: Build the website with angular
+      - name: Setup npm
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
-      - run: npm install
-      - run: tar -czf website.tar.gz *
 
+      - name: Build website with npm
+        run: | 
+          cd ./www
+          npm install
+          tar -czf website.tar.gz *
 
       - name: Archive Website
         uses: actions/upload-artifact@v4
         with:
           name: website
-          path: website.tar.gz
+          path: ./www/website.tar.gz

@@ -3,10 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>Kalman Filter Demo</title>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900' rel='stylesheet' type='text/css'>
     <style>
+      * {
+        font-family: "Roboto",serif;
+      }
+
       .column {
         float: left;
         width: 20%;
+        margin-right: 5%;
       }
       /* Clear floats after the columns */
       .row:after {
@@ -31,6 +37,13 @@
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <div class="row">
       <div class="column">
+        <h3>
+          This is the Kalman Demo
+        </h3>
+        <p>
+          Inputs control kalman's speed in pixels per second and rotation in radians.
+        </p>
+        <strong>Note: Rotation is counter-clockwise starting a 3PM</strong><br><hr>
         <input type="number" placeholder="0mps" id="velocity"><button id="set_velocity">Set Velocity</button>
         <input type="number" placeholder="0rad" id="rotation"><button id="set_rotation">Set Rotation</button>
       </div>
