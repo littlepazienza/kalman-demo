@@ -3,8 +3,8 @@ name: Build Website
 on: [push]
 
 jobs:
-  build-website:
-    name: Build website
+  wasm-to-tpm:
+    name: Publish wasm-pack generated package to npm
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -40,6 +40,18 @@ jobs:
           cd ./pkg
           npm publish --access public
 
+  archive-website:
+    name: Build website
+    runs-on: ubuntu-latest
+    needs: wasm-to-npm
+    if: always()
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+
+    steps:
       - name: Build website with npm
         run: |
           npm install www
