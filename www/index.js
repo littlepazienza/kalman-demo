@@ -1,21 +1,19 @@
-import { Universe, Kalman } from "@littlepaz/kalman-demo";
+import { Universe } from "../pkg";
 
-const CELL_SIZE = 10; // px
 const GRID_COLOR = "#CCCCCC";
-const EMPTY_COLOR = "#FFFFFF";
-const WALL_COLOR = "#000000";
 const KALMAN_COLOR = "#850c5d";
 
 // Construct the universe, and get its width and height.
+const CELL_SIZE = 10;
 const universe = Universe.new(30.0, 30.0);
-const width = universe.width() / 100;
-const height = universe.height() / 100;
+const width = universe.width() / 10;
+const height = universe.height() / 10;
 
 // Give the canvas room for all of our cells and a 1px border
 // around each of them.
 const canvas = document.getElementById("canvas");
-canvas.height = (CELL_SIZE + 1) * height + 1;
-canvas.width = (CELL_SIZE + 1) * width + 1;
+canvas.height = universe.width() + CELL_SIZE;
+canvas.width = universe.height() + CELL_SIZE;
 
 const ctx = canvas.getContext('2d');
 
@@ -76,22 +74,12 @@ drawGrid();
 drawUniverse();
 renderLoop();
 
-const registerInputs = () => {
-    document.getElementById('set_velocity').addEventListener('click', function(e)
-    {
-        setVelocity();
-    }, false);
-    document.getElementById('set_rotation').addEventListener('click', function(e)
-    {
-        setRotation();
-    }, false);
-}
-registerInputs();
+document.getElementById('set_goal').addEventListener('click', function(e)
+{
+    setGoal();
+}, false);
 
-const setVelocity = () => {
-    universe.set_kalman_velocity(document.getElementById("velocity").value)
-}
-const setRotation = () => {
-    universe.set_kalman_rotation(document.getElementById("rotation").value)
+const setGoal = () => {
+    universe.set_kalman_goal(document.getElementById("x").value, document.getElementById("y").value)
 }
 
