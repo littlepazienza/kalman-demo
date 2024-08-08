@@ -1,6 +1,9 @@
 name: Build Website
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   wasm-to-npm:
