@@ -9,11 +9,31 @@
         font-family: "Roboto",serif;
       }
 
-      .column {
+      .column-1 {
         float: left;
-        width: 20%;
-        margin-right: 5%;
+        width: 25vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
+
+      .column-2 {
+        float: left;
+        width: 50vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .column-3 {
+        float: left;
+        width: 25vw;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+      }
+
       /* Clear floats after the columns */
       .row:after {
         content: "";
@@ -34,21 +54,59 @@
     </style>
   </head>
   <body>
+    <div>
+      <h2>
+        This is the Kalman Demo
+      </h2>
+      Kalman moves in 2D space using a simple rotation and movement plc.
+      The rotation plc controls the angle of movement, and the movement
+      plc controls the speed of movement.
+      <hr>
+      <br><br>
+    </div>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <div class="row">
-      <div class="column">
-        <h3>
-          This is the Kalman Demo
-        </h3>
-        <p>
-          x and y goal
-        </p>
-        <label for="x">goal, x</label><input type="number" placeholder="x" id="x">
-        <label for="y">goal, y</label><input type="number" placeholder="y" id="y">
-        <button id="set_goal">Set Goal</button>
+      <div class="column-1">
+        <div>
+          <h3>
+            Goal
+          </h3>
+          <p>
+            Use the inputs to set the x and y position of the goal
+          </p>
+          <label for="x">goal, x</label><input type="number" placeholder="x" id="x"><br>
+          <label for="y">goal, y</label><input type="number" placeholder="y" id="y"><br>
+          <button id="set_goal">Set Goal</button>
+          <hr>
+          <br><br>
+        </div>
+          <h3>
+            Debug Info
+          </h3>
+          <p>Vectors are positional information: x, y, velocity (pixels per ms), rotation (rad)</p>
+          <label for="actual">Physical Position Information:</label><textarea id="actual"></textarea><br>
+          <label for="belief">Believed Position Information:</label><textarea id="belief"></textarea><br>
+          <label for="rotation_error">Rotation Sensor Error:</label><textarea id="rotation_error"></textarea><br>
+          <label for="movement_error">Velocity Sensor Error:</label><textarea id="movement_error"></textarea><br>
       </div>
-      <div class="column">
+      <div class="column-2">
         <canvas id="canvas"></canvas>
+      </div>
+      <div class="column-3">
+        <div>
+          <h3>
+            Sensor Error
+          </h3>
+          <p>
+            Setup the mean and std dev error of the sensors
+          </p>
+          <label for="rotation_m">Rotation Error: N(</label><input type="number" placeholder="μ" id="rotation_m" style="width: 50px;">
+          <label for="rotation_s">, </label><input type="number" placeholder="σ^2" id="rotation_s" style="width: 50px;">)
+          <button id="set_rotation_error">Set Error</button><br>
+          <label for="movement_m">Movement Error: N(</label><input type="number" placeholder="μ" id="movement_m" style="width: 50px;">
+          <label for="movement_s">, </label><input type="number" placeholder="σ^2" id="movement_s" style="width: 50px;">)
+          <button id="set_movement_error">Set Error</button>
+        <div>
       </div>
     </div>
     <script src="./bootstrap.js"></script>

@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/rustwasm/create-wasm-app#readme",
   "dependencies": {
-    "@littlepaz/kalman-demo": "0.1.1"
+    "@littlepaz/kalman-demo": "0.1.2"
   },
   "devDependencies": {
     "webpack": "^4.29.3",

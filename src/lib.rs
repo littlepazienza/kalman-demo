@@ -3,7 +3,7 @@ extern crate core;
 mod kalman;
 
 use wasm_bindgen::prelude::*;
-use kalman::Kalman;
+use crate::kalman::{Kalman};
 
 #[wasm_bindgen]
 #[derive(Clone)]
@@ -26,7 +26,7 @@ impl Universe {
     /*
      * Execute a single timestep.
      */
-    pub fn tick(&mut self) {
+    pub unsafe fn tick(&mut self) {
         self.kalman.tick(self.clone());
     }
 
@@ -57,20 +57,6 @@ impl Universe {
     /*
      * Used for test.
      */
-    pub fn set_kalman_velocity(&mut self, velocity: f32) {
-        self.kalman.set_velocity(velocity)
-    }
-
-    /*
-     * Used for test.
-     */
-    pub fn set_kalman_rotation(&mut self, rotation: f32) {
-        self.kalman.set_rotation(rotation)
-    }
-
-    /*
-     * Used for test.
-     */
     pub fn set_kalman_goal(&mut self, goal_x: f32, goal_y: f32) {
         if goal_x > 0f32 && goal_x < self.width as f32 && goal_y > 0f32 && goal_y < self.height as f32 {
             self.kalman.set_goal(goal_x, goal_y)
@@ -78,5 +64,21 @@ impl Universe {
             self.kalman.set_goal(-1f32, -1f32);
             log(&format!("Cannot set goal outside of universe bounds of ([0-{}], [0-{}])", self.width, self.height));
         }
+    }
+
+    /*
+     * Used for test.
+     */
+    pub unsafe fn set_kalman_rotation_error(&mut self, m: f32, std: f32) {
+        log(&format!("Setting kalman's rotation error to N({}, {})", m, std));
+        self.kalman.set_rotation_error(m, std);
+    }
+
+    /*
+     * Used for test.
+     */
+    pub unsafe fn set_kalman_movement_error(&mut self, m: f32, std: f32) {
+        log(&format!("Setting kalman's movement error to N({}, {})", m, std));
+        self.kalman.set_movement_error(m, std);
     }
 }
