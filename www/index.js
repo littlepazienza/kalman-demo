@@ -1,4 +1,4 @@
-import { Universe } from "../pkg";
+import { Universe } from "@littlepaz/kalman-demo";
 
 const GRID_COLOR = "#CCCCCC";
 const GOAL_COLOR = "#e60606";
