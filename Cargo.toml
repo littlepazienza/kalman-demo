@@ -1,6 +1,6 @@
 [package]
 name = "kalman-demo"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Benjamin Pazienza <pazienza.log@gmail.com>"]
 edition = "2021"
 repository = "git+https://github.com/littlepazienza/kalman-demo.git"
