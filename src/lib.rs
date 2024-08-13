@@ -1,6 +1,7 @@
 extern crate core;
 
 mod kalman;
+mod imu;
 
 use wasm_bindgen::prelude::*;
 use crate::kalman::{Kalman};
@@ -80,5 +81,13 @@ impl Universe {
     pub unsafe fn set_kalman_movement_error(&mut self, m: f32, std: f32) {
         log(&format!("Setting kalman's movement error to N({}, {})", m, std));
         self.kalman.set_movement_error(m, std);
+    }
+
+    /*
+     * Used for test.
+     */
+    pub unsafe fn set_kalman_position_error(&mut self, m: f32, std: f32) {
+        log(&format!("Setting kalman's position error to N({}, {})", m, std));
+        self.kalman.set_position_error(m, std);
     }
 }

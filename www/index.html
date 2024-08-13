@@ -12,24 +12,22 @@
       .column-1 {
         float: left;
         width: 25vw;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
       }
 
       .column-2 {
         float: left;
         width: 50vw;
         display: flex;
-        align-items: center;
         justify-content: center;
       }
 
       .column-3 {
         float: left;
         width: 25vw;
+      }
+
+      .flex {
         display: flex;
-        align-items: center;
         flex-direction: column;
         justify-content: center;
       }
@@ -58,9 +56,18 @@
       <h2>
         This is the Kalman Demo
       </h2>
-      Kalman moves in 2D space using a simple rotation and movement plc.
-      The rotation plc controls the angle of movement, and the movement
-      plc controls the speed of movement.
+      <p>
+        Kalman moves in 2D space, we can query his IMU to get his believed rotation and position
+        at any time, view the debug section to see his believed position and the emulated physical
+        position.
+        <br><br>
+        There is also a dialog on the right to input the error statistics N(μ,σ) for the
+        IMU, the error is applied to each command
+        <br>
+        For example for a rotation of 1 rad, a sample error from N(0, 0.001) could be 0.0004,
+        so the physical emulated rotation will be 1.0004.
+      </p>
+      <br>
       <hr>
       <br><br>
     </div>
@@ -80,14 +87,20 @@
           <hr>
           <br><br>
         </div>
-          <h3>
-            Debug Info
-          </h3>
-          <p>Vectors are positional information: x, y, velocity (pixels per ms), rotation (rad)</p>
+        <h3>
+          Position Info
+        </h3>
+        <p>Vectors are positional information: x, y, velocity (pixels per ms), rotation (rad)</p>
+        <div class="flex">
           <label for="actual">Physical Position Information:</label><textarea id="actual"></textarea><br>
           <label for="belief">Believed Position Information:</label><textarea id="belief"></textarea><br>
-          <label for="rotation_error">Rotation Sensor Error:</label><textarea id="rotation_error"></textarea><br>
-          <label for="movement_error">Velocity Sensor Error:</label><textarea id="movement_error"></textarea><br>
+        </div>
+        <hr>
+        <br><br>
+        <h3>
+          Covariance Elipse
+        </h3>
+        <canvas id="covariance"></canvas>
       </div>
       <div class="column-2">
         <canvas id="canvas"></canvas>
@@ -101,12 +114,21 @@
             Setup the mean and std dev error of the sensors
           </p>
           <label for="rotation_m">Rotation Error: N(</label><input type="number" placeholder="μ" id="rotation_m" style="width: 50px;">
-          <label for="rotation_s">, </label><input type="number" placeholder="σ^2" id="rotation_s" style="width: 50px;">)
+          <label for="rotation_s">, </label><input type="number" placeholder="σ" id="rotation_s" style="width: 50px;">)
           <button id="set_rotation_error">Set Error</button><br>
           <label for="movement_m">Movement Error: N(</label><input type="number" placeholder="μ" id="movement_m" style="width: 50px;">
-          <label for="movement_s">, </label><input type="number" placeholder="σ^2" id="movement_s" style="width: 50px;">)
-          <button id="set_movement_error">Set Error</button>
-        <div>
+          <label for="movement_s">, </label><input type="number" placeholder="σ" id="movement_s" style="width: 50px;">)
+          <button id="set_movement_error">Set Error</button><br>
+          <label for="position_m">Position Error: N(</label><input type="number" placeholder="μ" id="position_m" style="width: 50px;">
+          <label for="position_m">, </label><input type="number" placeholder="σ" id="position_s" style="width: 50px;">)
+          <button id="set_position_error">Set Error</button>
+          <br><br>
+          <div class="flex">
+            <label for="rotation_error">Rotation Sensor Error:</label><textarea id="rotation_error"></textarea><br>
+            <label for="movement_error">Velocity Sensor Error:</label><textarea id="movement_error"></textarea><br>
+            <label for="position_error">Position Error:</label><textarea id="position_error"></textarea><br>
+          </div>
+        </div>
       </div>
     </div>
     <script src="./bootstrap.js"></script>
