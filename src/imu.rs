@@ -14,11 +14,6 @@ pub struct Imu {
     actual_pos: Vec<f32>,
 
     /*
-     * The commanded velocity and rotation of kalman.
-     */
-    commands: Vec<f32>,
-
-    /*
      * The distribution of error for reading the rotational angle of kalman.
      */
     rotation_distribution: Box<Normal<f32>>,
@@ -38,7 +33,6 @@ impl Imu {
     pub fn new(x: f32, y: f32) -> Imu {
         Imu {
             actual_pos: Vec::from([x, y, 0.0, 0.0]),
-            commands: Vec::from([0.0, 0.0]),
             rotation_distribution: Box::new(Normal::new(0.0, 0.001).unwrap()),
             velocity_distribution: Box::new(Normal::new(0.0, 0.001).unwrap()),
             position_distribution: Box::new(Normal::new(0.0, 0.001).unwrap())
@@ -64,15 +58,6 @@ impl Imu {
         Vec::from([(*self.position_distribution).mean(), (*self.position_distribution).std_dev()])
     }
 
-
-    pub unsafe fn set_command_rotation(&mut self, theta: f32) {
-        self.commands[1] = theta;
-    }
-
-    pub unsafe fn set_command_velocity(&mut self, velocity: f32) {
-        self.commands[0] = velocity;
-    }
-
     pub fn set_movement_error(&mut self, m: f32, std: f32) {
         log(&format!("Setting my rotation error to N({}, {})", m, std));
         *self.velocity_distribution = Normal::new(m, std).unwrap();
@@ -88,19 +73,19 @@ impl Imu {
         *self.position_distribution = Normal::new(m, std).unwrap();
     }
 
-    pub unsafe fn simulate(&mut self, universe: Universe) {
-        log(&format!("Simulating 1 ms with rotation {}, velocity {}, position {}, {}", self.commands[1], self.commands[0], self.actual_pos[0], self.actual_pos[1]));
+    pub unsafe fn simulate(&mut self, velocity: f32, theta: f32, universe: Universe) {
+        log(&format!("Simulating 1 ms with rotation {}, velocity {}, position {}, {}", theta, velocity, self.actual_pos[0], self.actual_pos[1]));
 
         // Update the velocity
-        self.actual_pos[2] = self.generate_velocity_with_error(self.commands[0]);
-        log(&format!("Commanded velocity: {}, actual: {}", self.commands[0], self.actual_pos[2]));
+        self.actual_pos[2] = self.generate_velocity_with_error(velocity);
+        log(&format!("Commanded velocity: {}, actual: {}", velocity, self.actual_pos[2]));
 
         // Update the rotation
-        self.actual_pos[3] = self.generate_rotation_with_error(self.commands[1]);
-        log(&format!("Commanded rotation: {}, actual: {}", self.commands[1], self.actual_pos[3]));
+        self.actual_pos[3] = self.generate_rotation_with_error(theta);
+        log(&format!("Commanded rotation: {}, actual: {}", theta, self.actual_pos[3]));
 
         // If movement is expected, introduce movement variability from unknown variables
-        if self.commands[0] != 0f32 {
+        if velocity != 0f32 {
             // Update the x position
             let pre_x = (self.actual_pos[0] + self.actual_pos[3].cos() * self.actual_pos[2]).max(0f32).min(universe.width as f32);
             self.actual_pos[0] = self.generate_position_with_error(pre_x);

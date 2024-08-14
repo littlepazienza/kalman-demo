@@ -1,4 +1,4 @@
-import { Universe } from "@littlepaz/kalman-demo";
+import { Universe } from "../pkg";
 
 const GRID_COLOR = "#CCCCCC";
 const GOAL_COLOR = "#e60606";
@@ -81,8 +81,8 @@ const drawUniverse = () => {
     ctx.beginPath();
     ctx.fillStyle = KALMAN_COLOR;
     ctx.fillRect(
-        universe.kalman().get_x(),
-        universe.kalman().get_y(),
+        universe.kalman().get_actual()[0],
+        universe.kalman().get_actual()[1],
         CELL_SIZE,
         CELL_SIZE
     );
@@ -90,7 +90,7 @@ const drawUniverse = () => {
 };
 
 const debugInfo = () => {
-    if (universe.kalman().get_velocity() > 0) {
+    if (universe.kalman().get_belief()[2] > 0) {
         x += 1
         const actual = universe.kalman().get_actual()
         const belief = universe.kalman().get_belief()

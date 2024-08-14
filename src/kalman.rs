@@ -1,7 +1,8 @@
+use std::ops::{Add, Index, Mul, Sub};
 use std::vec::Vec;
 use wasm_bindgen::prelude::wasm_bindgen;
 use crate::{log, Universe, imu::Imu};
-use ndarray::{arr2, Array2};
+use ndarray::{arr1, arr2, Array2};
 
 static VELOCITY: f32 = 1f32;
 
@@ -9,14 +10,19 @@ static VELOCITY: f32 = 1f32;
 #[derive(Clone)]
 pub struct Kalman {
     /*
-     * The believed state of kalman.
+     * The believed position of kalman.
      */
     belief_pos: Vec<f32>,
 
     /*
+     * The believed state of kalman.
+     */
+    state: Vec<f32>,
+
+    /*
      * The accrued covariance matrix
      */
-    covariance_matrix: Array2<f32>,
+    covariance_matrix: Box<Array2<f32>>,
 
     /*
      * The goal x and y.
@@ -31,28 +37,12 @@ pub struct Kalman {
 
 #[wasm_bindgen]
 impl Kalman {
-    pub fn get_x(&self) -> f32 {
-        return self.imu.get_actual_pos()[0];
-    }
-
-    pub fn get_y(&self) -> f32 {
-        return self.imu.get_actual_pos()[1];
-    }
-
-    pub fn get_velocity(&self) -> f32 {
-        return self.imu.get_actual_pos()[2];
-    }
-
-    pub fn get_rotation(&self) -> f32 {
-        return self.imu.get_actual_pos()[3];
-    }
-
     pub fn get_goal(&self) -> Vec<f32> {
         return self.goal.clone()
     }
 
     pub fn get_belief(&self) -> Vec<f32> {
-        return self.belief_pos.clone();
+        Vec::from([self.belief_pos[0], self.belief_pos[1], self.state[0], self.state[1]])
     }
 
     pub fn get_actual(&self) -> Vec<f32> {
@@ -81,61 +71,75 @@ impl Kalman {
 
     pub fn new(x: f32, y: f32) -> Kalman {
         Kalman {
-            belief_pos: Vec::from([x, y, 0.0, 0.0]),
-            covariance_matrix: arr2(&[
-                [0.0, 0.0],
-                [0.0, 0.0]
-            ]),
+            belief_pos: Vec::from([x, y]),
+            state: Vec::from([0.0, 0.0]),
+            covariance_matrix: Box::new(arr2(&[
+                [1.0, 0.0],
+                [0.0, 1.0]
+            ])),
             goal: Vec::from([-1f32, -1f32]),
-            imu: Imu::new(x, y)
+            imu: Imu::new(x, y),
         }
-    }
-
-    /*
-      * Command the rotation plc to rotate to a given rotation in radians.
-      */
-    pub unsafe fn command_rotation(&mut self, rotation: f32) {
-        self.belief_pos[3] = rotation;
-        self.imu.set_command_rotation(rotation);
-    }
-
-    /*
-     * Command the movement plc to move the bot at a given velocity.
-     */
-    pub unsafe fn command_movement(&mut self, velocity: f32) {
-        self.belief_pos[2] = velocity;
-        self.imu.set_command_velocity(velocity);
     }
 
     /*
      * Update 1 ms of movement.
      */
     pub unsafe fn tick(&mut self, universe: Universe) {
+        let mut velocity: f32 = self.state[0];
+        let mut theta: f32 = self.state[1];
         if self.at_goal() {
-            self.command_movement(0f32);
+            velocity = 0f32;
         } else {
-            // If the bot's angle is wrong, it will rotate to correct, otherwise it will move
-            let desired_theta = self.calculate_rotation_to_goal();
-            if self.belief_pos[3] != desired_theta {
-                self.command_rotation(desired_theta);
-            }
-
-            // Always move at a fixed speed
-            self.command_movement(VELOCITY);
+            // Rotate to correct based on the belief, and move at a fixed speed
+            theta = self.calculate_rotation_to_goal();
+            velocity = VELOCITY;
         }
 
-        // Let the simulated IMU update kalman's vectors with some induced error given the commands
-        self.imu.simulate(universe.clone());
+        // Let the simulated IMU update
+        self.imu.simulate(velocity, theta, universe.clone());
 
-        // Read from the IMU and set a belief for velocity and rotation
-        // TODO: Interpret the imu and build a belief via a kalman filter
-        let read = self.imu.read_imu();
-        self.belief_pos[2] = read.get_state()[0];
-        self.belief_pos[3] = read.get_state()[1];
+        // Execute the kalman filter
+        // Step one predict the future state and state covariance matrix before measurement
+        if velocity != 0f32 {
+            let x1 = arr2(&[
+                [velocity, theta]
+            ]);
+            let z = arr2(&[
+                [self.state[0] - velocity, self.state[1] - theta]
+            ]);
+            let Q = arr2(&[
+                [0.01, 0.001],
+                [0.001, 0.01]
+            ]);
+            let R = arr2(&[
+                [0.01, 0.001],
+                [0.001, 0.01]
+            ]);
+            let I = arr2(&[
+                [1.0, 0.0],
+                [0.0, 1.0]
+            ]);
+            let P1 = (*self.covariance_matrix).clone().add(Q.clone());
 
-        // Update the beliefs of the x and y position
-        self.belief_pos[0] = (self.belief_pos[0] + self.belief_pos[3].cos() * self.belief_pos[2]).max(0f32).min(universe.width as f32);
-        self.belief_pos[1] = (self.belief_pos[1] + self.belief_pos[3].sin() * self.belief_pos[2]).max(0f32).min(universe.height as f32);
+            // Take a measurement, save off the measurement covariance matrix
+            let read = self.imu.read_imu();
+            let H = read.get_covariance_matrix();
+
+            // Step 2, calculate the kalman gain, new adjusted state and state covariance matrix
+            let K = P1.clone() * H.t() * arr2(&[[1.0, 1.0], [1.0, 1.0]]) / (H.clone() * P1.clone() * H.t() + R.t());
+            let x = x1.clone().add(K.clone().mul(z.sub(H.clone().mul(x1.clone()))));
+            let P = I.sub(K.clone().mul(H.clone())).mul(P1.clone());
+            self.state[0] = *x.index([0, 0]);
+            self.state[1] = *x.index([0, 1]);
+            *self.covariance_matrix = P;
+
+            // Update the beliefs of the x and y position using our new adjusted state
+            self.belief_pos[0] = (self.belief_pos[0] + self.state[1].cos() * self.state[0]).max(0f32).min(universe.width as f32);
+            self.belief_pos[1] = (self.belief_pos[1] + self.state[1].sin() * self.state[0]).max(0f32).min(universe.height as f32);
+
+            log(&format!("Kalman filter complete. x: {}, y: {}, velocity: {}, rotation: {}, state_covariance: {}", self.belief_pos[0], self.belief_pos[1], self.state[0], self.state[1], self.covariance_matrix.to_string()));
+        }
     }
 
     /*
