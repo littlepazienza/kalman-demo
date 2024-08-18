@@ -20,9 +20,8 @@ getrandom = { version = "0.2", features = ["js"] }
 # all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
 # code size when deploying.
 console_error_panic_hook = { version = "0.1.7", optional = true }
-rand_distr = "0.4.3"
-rand = "0.8.5"
 ndarray = "0.16.0"
+rstat = "0.6.0"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.34"
