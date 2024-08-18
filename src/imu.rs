@@ -1,5 +1,6 @@
 use ndarray::{arr2, Array2};
 use rstat::Distribution;
+use rstat::linalg::Matrix;
 use rstat::normal::{MvNormal, MvNormalParams};
 use wasm_bindgen::prelude::wasm_bindgen;
 use crate::{log, Universe};
@@ -39,7 +40,7 @@ impl Imu {
         (*self.distribution).params()
     }
 
-    pub fn set_error(&mut self, m: Vec<f32>, covariance_matrix: Array2<f32>) {
+    pub fn set_error(&mut self, m: Vec<f32>, covariance_matrix: Matrix<f32>) {
         log(&format!("Setting my rotation error to N({:?}, {:?})", m, covariance_matrix));
         *self.distribution = MvNormal::new(m, covariance_matrix).unwrap()
     }
@@ -68,8 +69,9 @@ impl Imu {
      * Read the actual velocity achieved by kalman, plus some error.
      */
     pub unsafe fn read_imu(&self) -> ImuRead {
-        let velocity = self.generate_velocity_with_error(self.actual_pos[2]);
-        let rotation = self.generate_rotation_with_error(self.actual_pos[3]);
+        let sample = (*self.distribution).sample();
+        let velocity = sample[0];
+        let rotation = sample[1];
         ImuRead {
             state: Vec::from([velocity, rotation]),
             covariance_matrix: arr2(&[

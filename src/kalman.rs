@@ -2,7 +2,9 @@ use std::ops::{Add, Index, Mul, Sub};
 use std::vec::Vec;
 use wasm_bindgen::prelude::wasm_bindgen;
 use crate::{log, Universe, imu::Imu};
-use ndarray::{arr1, arr2, Array2};
+use ndarray::{arr2, Array2};
+use rstat::linalg::Matrix;
+use rstat::normal::MvNormalParams;
 
 static VELOCITY: f32 = 1f32;
 
@@ -54,16 +56,8 @@ impl Kalman {
             && self.goal[1] < self.belief_pos[1] && self.belief_pos[1] < self.goal[1] + 10f32
     }
 
-    pub unsafe fn get_movement_error(&self) -> Vec<f32> {
-        self.imu.get_movement_error()
-    }
-
-    pub unsafe fn get_rotation_error(&self) -> Vec<f32> {
-        self.imu.get_rotation_error()
-    }
-
-    pub unsafe fn get_position_error(&self) -> Vec<f32> {
-        self.imu.get_position_error()
+    pub unsafe fn get_error(&self) -> MvNormalParams {
+        self.imu.get_error()
     }
 }
 
@@ -175,21 +169,7 @@ impl Kalman {
     /*
      * Set the rotation error, used in test.
      */
-    pub unsafe fn set_rotation_error(&mut self, m: f32, std: f32) {
-        self.imu.set_rotation_error(m, std);
-    }
-
-    /*
-     * Set the movement error, used in test.
-     */
-    pub unsafe fn set_movement_error(&mut self, m: f32, std: f32) {
-        self.imu.set_movement_error(m, std);
-    }
-
-    /*
-     * Set the position error, used in test.
-     */
-    pub unsafe fn set_position_error(&mut self, m: f32, std: f32) {
-        self.imu.set_position_error(m, std);
+    pub unsafe fn set_error(&mut self, m: Vec<f32>, std: Matrix<f32>) {
+        self.imu.set_error(m, std);
     }
 }

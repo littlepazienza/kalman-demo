@@ -3,6 +3,7 @@ extern crate core;
 mod kalman;
 mod imu;
 
+use rstat::linalg::Matrix;
 use wasm_bindgen::prelude::*;
 use crate::kalman::{Kalman};
 
@@ -70,24 +71,8 @@ impl Universe {
     /*
      * Used for test.
      */
-    pub unsafe fn set_kalman_rotation_error(&mut self, m: f32, std: f32) {
-        log(&format!("Setting kalman's rotation error to N({}, {})", m, std));
-        self.kalman.set_rotation_error(m, std);
-    }
-
-    /*
-     * Used for test.
-     */
-    pub unsafe fn set_kalman_movement_error(&mut self, m: f32, std: f32) {
-        log(&format!("Setting kalman's movement error to N({}, {})", m, std));
-        self.kalman.set_movement_error(m, std);
-    }
-
-    /*
-     * Used for test.
-     */
-    pub unsafe fn set_kalman_position_error(&mut self, m: f32, std: f32) {
-        log(&format!("Setting kalman's position error to N({}, {})", m, std));
-        self.kalman.set_position_error(m, std);
+    pub unsafe fn set_kalman_error(&mut self, m: Vec<f32>, std: Matrix<f32>) {
+        log(&format!("Setting kalman's error to N({:?}, {:?})", m, std));
+        self.kalman.set_error(m, std);
     }
 }
