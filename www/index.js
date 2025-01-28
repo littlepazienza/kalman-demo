@@ -81,8 +81,8 @@ const drawUniverse = () => {
     ctx.beginPath();
     ctx.fillStyle = KALMAN_COLOR;
     ctx.fillRect(
-        universe.kalman().get_x(),
-        universe.kalman().get_y(),
+        universe.kalman().get_actual()[0],
+        universe.kalman().get_actual()[1],
         CELL_SIZE,
         CELL_SIZE
     );
@@ -90,7 +90,7 @@ const drawUniverse = () => {
 };
 
 const debugInfo = () => {
-    if (universe.kalman().get_velocity() > 0) {
+    if (universe.kalman().get_belief()[2] > 0) {
         x += 1
         const actual = universe.kalman().get_actual()
         const belief = universe.kalman().get_belief()
@@ -105,15 +105,10 @@ const debugInfo = () => {
     }
 
     // Paint the error debug info
-    const rotation_error = universe.kalman().get_rotation_error()
-    const movement_error = universe.kalman().get_movement_error()
-    const position_error = universe.kalman().get_position_error()
-    const rotation_txt = document.getElementById('rotation_error')
+    const movement_error = universe.kalman().get_error_mean()
+    const movemnet_cov = universe.kalman().get_error_covariance()
     const movement_txt = document.getElementById('movement_error')
-    const position_txt = document.getElementById('position_error')
-    rotation_txt.value = `N(${rotation_error[0].toFixed(5)}, ${rotation_error[1].toFixed(5)})`
-    movement_txt.value = `N(${movement_error[0].toFixed(5)}, ${movement_error[1].toFixed(5)})`
-    position_txt.value = `N(${position_error[0].toFixed(5)}, ${position_error[1].toFixed(5)})`
+    movement_txt.value = `N([${movement_error[0].toFixed(5)}, ${movement_error[1].toFixed(5)}], [${movemnet_cov[0].toFixed(5)}, ${movemnet_cov[1].toFixed(5)}, ${movemnet_cov[2].toFixed(5)}, ${movemnet_cov[3].toFixed(5)}])`
 }
 
 /*
@@ -125,29 +120,17 @@ document.getElementById('set_goal').addEventListener('click', function(e)
 {
     setGoal();
 }, false);
-document.getElementById('set_rotation_error').addEventListener('click', function(e)
-{
-    setRotationError();
-}, false);
 document.getElementById('set_movement_error').addEventListener('click', function(e)
 {
     setMovementError();
-}, false);
-document.getElementById('set_position_error').addEventListener('click', function(e)
-{
-    setPositionError();
 }, false);
 const setGoal = () => {
     universe.set_kalman_goal(document.getElementById("x").value, document.getElementById("y").value)
 }
 const setMovementError = () => {
-    universe.set_kalman_movement_error(document.getElementById("movement_m").value, document.getElementById("movement_s").value)
-}
-const setRotationError = () => {
-    universe.set_kalman_rotation_error(document.getElementById("rotation_m").value, document.getElementById("rotation_s").value)
-}
-const setPositionError = () => {
-    universe.set_kalman_position_error(document.getElementById("position_m").value, document.getElementById("position_s").value)
+    let movement_m = JSON.parse(document.getElementById("movement_m").value);
+    let movement_std = JSON.parse(document.getElementById("movement_s").value);
+    universe.set_kalman_movement_error(movement_m, movement_std);
 }
 
 /*

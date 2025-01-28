@@ -113,20 +113,12 @@
           <p>
             Setup the mean and std dev error of the sensors
           </p>
-          <label for="rotation_m">Rotation Error: N(</label><input type="number" placeholder="μ" id="rotation_m" style="width: 50px;">
-          <label for="rotation_s">, </label><input type="number" placeholder="σ" id="rotation_s" style="width: 50px;">)
-          <button id="set_rotation_error">Set Error</button><br>
-          <label for="movement_m">Movement Error: N(</label><input type="number" placeholder="μ" id="movement_m" style="width: 50px;">
-          <label for="movement_s">, </label><input type="number" placeholder="σ" id="movement_s" style="width: 50px;">)
+          <label for="movement_m">Movement Error: N(2 element comma separated mean column vector, 4 element comma separated 2D covariance matrix): N(</label><input type="text" placeholder="μ" id="movement_m" style="width: 50px;">
+          <label for="movement_s">, </label><input type="text" placeholder="σ" id="movement_s" style="width: 50px;">)
           <button id="set_movement_error">Set Error</button><br>
-          <label for="position_m">Position Error: N(</label><input type="number" placeholder="μ" id="position_m" style="width: 50px;">
-          <label for="position_m">, </label><input type="number" placeholder="σ" id="position_s" style="width: 50px;">)
-          <button id="set_position_error">Set Error</button>
           <br><br>
           <div class="flex">
-            <label for="rotation_error">Rotation Sensor Error:</label><textarea id="rotation_error"></textarea><br>
             <label for="movement_error">Velocity Sensor Error:</label><textarea id="movement_error"></textarea><br>
-            <label for="position_error">Position Error:</label><textarea id="position_error"></textarea><br>
           </div>
         </div>
       </div>

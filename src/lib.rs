@@ -3,6 +3,7 @@ extern crate core;
 mod kalman;
 mod imu;
 
+use nalgebra::DMatrix;
 use wasm_bindgen::prelude::*;
 use crate::kalman::{Kalman};
 
@@ -31,7 +32,7 @@ impl Universe {
         self.kalman.tick(self.clone());
     }
 
-    pub fn new(seed_w: f32, seed_h: f32) -> Universe {
+    pub fn new(seed_w: f64, seed_h: f64) -> Universe {
         let width = 640;
         let height = 640;
         let kalman = Kalman::new(seed_w, seed_h);
@@ -58,11 +59,11 @@ impl Universe {
     /*
      * Used for test.
      */
-    pub fn set_kalman_goal(&mut self, goal_x: f32, goal_y: f32) {
-        if goal_x > 0f32 && goal_x < self.width as f32 && goal_y > 0f32 && goal_y < self.height as f32 {
+    pub fn set_kalman_goal(&mut self, goal_x: f64, goal_y: f64) {
+        if goal_x > 0. && goal_x < self.width as f64 && goal_y > 0. && goal_y < self.height as f64 {
             self.kalman.set_goal(goal_x, goal_y)
         } else {
-            self.kalman.set_goal(-1f32, -1f32);
+            self.kalman.set_goal(-1., -1.);
             log(&format!("Cannot set goal outside of universe bounds of ([0-{}], [0-{}])", self.width, self.height));
         }
     }
@@ -70,24 +71,8 @@ impl Universe {
     /*
      * Used for test.
      */
-    pub unsafe fn set_kalman_rotation_error(&mut self, m: f32, std: f32) {
-        log(&format!("Setting kalman's rotation error to N({}, {})", m, std));
-        self.kalman.set_rotation_error(m, std);
-    }
-
-    /*
-     * Used for test.
-     */
-    pub unsafe fn set_kalman_movement_error(&mut self, m: f32, std: f32) {
-        log(&format!("Setting kalman's movement error to N({}, {})", m, std));
-        self.kalman.set_movement_error(m, std);
-    }
-
-    /*
-     * Used for test.
-     */
-    pub unsafe fn set_kalman_position_error(&mut self, m: f32, std: f32) {
-        log(&format!("Setting kalman's position error to N({}, {})", m, std));
-        self.kalman.set_position_error(m, std);
+    pub unsafe fn set_kalman_error(&mut self, m: Vec<f64>, covariance: Vec<f64>) {
+        log(&format!("Setting kalman's error to N({:?}, {:?})", m, covariance));
+        self.kalman.set_error(m, covariance);
     }
 }
